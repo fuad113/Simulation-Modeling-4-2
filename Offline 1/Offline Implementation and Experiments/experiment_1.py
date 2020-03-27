@@ -9,6 +9,23 @@ For the sake of comparison, while plotting results from simulation, also produce
 import heapq
 import random
 import matplotlib.pyplot as plt
+import math
+import lcgrand as lg
+
+
+#status of the server idle or busy
+busy=1
+idle=0
+
+#total simulation time
+total_simulation_time=100
+
+
+#expon function
+def expon(rate):
+    mean= 1 / rate
+    return  -mean * math.log(lg.lcgrand(1))
+
 
 
 # Parameters
@@ -19,7 +36,6 @@ class Params:
         self.k = k
     # Note lambd and mu are not mean value, they are rates i.e. (1/mean)
 
-# Write more functions if required
 
 
 # States and statistical counters
@@ -27,7 +43,16 @@ class States:
     def __init__(self):
         # States
         self.queue = []
-        # Declare other states variables that might be needed
+        #other variables
+        self.time_last_event= 0.0
+        self.num_in_q = 0
+        self.server_status = idle
+        self.total_time_server_served = 0
+
+        self.area_num_in_q = 0.0
+        self.total_time_of_delays =0.0
+        self.area_num_in_q = 0.0
+        self.area_server_status = 0.0
 
         # Statistics
         self.util = 0.0
@@ -36,12 +61,31 @@ class States:
         self.served = 0
 
     def update(self, sim, event):
-        # Complete this function
-        None
+        #update the statistical values
+
+        #Compute time since last event, and update last-event-time- marker
+        time_since_last_event = sim.now() - self.time_last_event
+        self.time_last_event= sim.now()
+
+        #Update area under number-in-queue function
+        self.area_num_in_q += self.num_in_q * time_since_last_event
+
+        #Update area under server-busy indicator function.
+        self.area_server_status += self.server_status * time_since_last_event
+
+        #Update total time served
+        self.total_time_server_served += self.server_status * time_since_last_event
+
 
     def finish(self, sim):
-        # Complete this function
-        None
+        if(self.served == 0):
+            self.avgQdelay=0
+        else:
+            self.avgQdelay = self.total_time_of_delays / self.served
+
+        #self.avgQlength = self.area_num_in_q / sim.now()
+        #self.util = self.area_server_status / sim.now()
+
 
     def printResults(self, sim):
         # DO NOT CHANGE THESE LINES
@@ -50,6 +94,7 @@ class States:
         print('MMk Average queue length: %lf' % (self.avgQlength))
         print('MMk Average customer delay in queue: %lf' % (self.avgQdelay))
         print('MMk Time-average server utility: %lf' % (self.util))
+        print('MMk Server total served: %lf' % (self.total_time_server_served) )
 
     def getResults(self, sim):
         return (self.avgQlength, self.avgQdelay, self.util)
@@ -77,8 +122,16 @@ class StartEvent(Event):
         self.sim = sim
 
     def process(self, sim):
-        # Complete this function
-        None
+        #Beginning of the service. Server is waiting for an arrival
+        l= self.sim.params.lambd
+        first_arrival_time = self.eventTime + expon(l)
+
+        #schedule the event in the simulator
+        sim.scheduleEvent(ArrivalEvent(first_arrival_time, sim))
+
+        #Scheduleing the exit event of the simulation
+        sim.scheduleEvent(ExitEvent(total_simulation_time,sim))
+
 
 
 class ExitEvent(Event):
@@ -88,22 +141,73 @@ class ExitEvent(Event):
         self.sim = sim
 
     def process(self, sim):
-        # Complete this function
-        None
+        #exit event is scheduled in the start event already
+        time_now= self.eventTime
+        print("This is the Exit Event at time: ", time_now)
+
 
 
 class ArrivalEvent(Event):
-    # Write __init__ function
+    def __init__(self, eventTime, sim):
+        self.eventTime = eventTime
+        self.eventType = 'ARRIVAL'
+        self.sim = sim
+
+
     def process(self, sim):
-        # Complete this function
-        None
+        #schedule the next arrival
+        time_next_event= sim.now() + expon(sim.params.lambd)
+        sim.scheduleEvent(ArrivalEvent(time_next_event,sim))
+
+        if(sim.states.server_status == busy):
+            sim.states.num_in_q+=1
+            sim.states.queue.append(sim.now())
+
+        else:
+            delay=0.0
+            sim.states.total_time_of_delays+=delay
+
+            #increment the number of customer served
+            sim.states.served += 1
+            sim.states.server_status= busy
+
+            #schedule a departure fot this arrival
+            time= sim.now() + expon(sim.params.mu)
+            sim.scheduleEvent(DepartureEvent(time,sim))
+
+
+
 
 
 class DepartureEvent(Event):
-    # Write __init__ function
+    def __init__(self, eventTime, sim):
+        self.eventTime = eventTime
+        self.eventType = 'ARRIVAL'
+        self.sim = sim
+
+
     def process(self, sim):
-        # Complete this function
-        None
+        #check whether the queue is empty
+        if(sim.states.num_in_q == 0):
+            sim.states.server_status=idle
+
+        else:
+            #decrease the number of people in queue
+            sim.states.num_in_q -= 1
+
+            # remove the 1st customer from the waiting queue
+            sim.states.queue.pop(0)
+
+            #compute the delay
+            delay= sim.now() - sim.states.queue[0]
+            sim.states.total_time_of_delays += delay
+
+            #increment the num of customer served
+            sim.states.served+=1
+
+            #schedule next departure
+            time=sim.now() + expon(sim.params.mu)
+            sim.scheduleEvent(DepartureEvent(time,sim))
 
 
 class Simulator:
