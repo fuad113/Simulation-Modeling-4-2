@@ -28,6 +28,21 @@ class Params:
         self.k = k
     # Note lambd and mu are not mean value, they are rates i.e. (1/mean)
 
+    def analyticalResults(self):
+
+        l= self.lambd
+        m= self.mu
+
+        L= (l*l) / (m * (m-l))
+        D= l / (m * (m-l))
+        U= l/m
+
+        print()
+        print('Analytical Results:')
+        print('MMk Average queue length: %lf' % (L))
+        print('MMk Average customer delay in queue: %lf' % (D))
+        print('MMk Time-average server utility: %lf' % (U))
+
 
 
 # States and statistical counters
@@ -120,7 +135,7 @@ class StartEvent(Event):
 
     def process(self, sim):
         #Beginning of the service. Server is waiting for an arrival
-        l= self.sim.params.lambd
+        l= sim.params.lambd
         first_arrival_time = self.eventTime + expon(l)
 
         #schedule the event in the simulator
@@ -140,7 +155,7 @@ class ExitEvent(Event):
     def process(self, sim):
         #exit event is scheduled in the start event already
         time_now= self.eventTime
-        #print("This is the Exit Event at time: ", time_now)
+        print("This is the Exit Event at time: ", time_now)
 
 
 
@@ -234,7 +249,7 @@ class Simulator:
             time, event = heapq.heappop(self.eventQ)
 
             if event.eventType == 'EXIT':
-                print(event.eventTime, 'Event', event)
+                #print(event.eventTime, 'Event', event)
                 self.simclock = event.eventTime
                 event.process(self)
                 print()
@@ -256,19 +271,7 @@ class Simulator:
         return self.states.getResults(self)
 
     def printanalyticalResults(self):
-
-        l= self.params.lambd
-        m= self.params.mu
-
-        L= (l*l) / (m * (m-l))
-        D= l / (m * (m-l))
-        U= l/m
-
-        print()
-        print('Analytical Results:')
-        print('MMk Average queue length: %lf' % (L))
-        print('MMk Average customer delay in queue: %lf' % (D))
-        print('MMk Time-average server utility: %lf' % (U))
+        self.params.analyticalResults()
 
 
 
