@@ -260,6 +260,7 @@ class Simulator:
     def initialize(self):
         self.simclock = 0
         self.scheduleEvent(StartEvent(0, self))
+        lg.resetzrng()
 
     def configure(self, params, states):
         self.params = params
@@ -321,7 +322,6 @@ def experiment3():
     avglength = []
     avgdelay = []
     util = []
-
 
     for k in k_arr:
 
