@@ -56,7 +56,6 @@ class States:
         self.server_status = IDLE
         self.total_time_server_served = 0
 
-        self.area_num_in_q = 0.0
         self.total_time_of_delays =0.0
         self.area_num_in_q = 0.0
         self.area_server_status = 0.0

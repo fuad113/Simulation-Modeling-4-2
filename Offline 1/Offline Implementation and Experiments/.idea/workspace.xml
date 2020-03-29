@@ -11,23 +11,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="experiment_1.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/experiment_1.py">
+      <file leaf-file-name="mmk.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../Problem Specification &amp; given codes/mmk.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1656">
-              <caret line="291" column="10" lean-forward="true" selection-start-line="291" selection-start-column="10" selection-end-line="291" selection-end-column="10" />
-              <folding>
-                <element signature="e#386#398#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-180">
+              <caret line="180" column="30" lean-forward="true" selection-start-line="180" selection-start-column="30" selection-end-line="180" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="experiment_2.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/experiment_2.py">
+      <file leaf-file-name="experiment_3.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/experiment_3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="251" column="17" selection-start-line="251" selection-start-column="17" selection-end-line="251" selection-end-column="17" />
+            <state relative-caret-position="279">
+              <caret line="356" column="14" lean-forward="true" selection-start-line="356" selection-start-column="14" selection-end-line="356" selection-end-column="14" />
               <folding>
                 <element signature="e#386#398#0" expanded="true" />
               </folding>
@@ -58,15 +55,15 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/experiment_3.py" />
         <option value="$PROJECT_DIR$/experiment_4.py" />
         <option value="$PROJECT_DIR$/lcgrand.py" />
-        <option value="$PROJECT_DIR$/experiment_1.py" />
         <option value="$PROJECT_DIR$/experiment_2.py" />
+        <option value="$PROJECT_DIR$/experiment_1.py" />
+        <option value="$PROJECT_DIR$/experiment_3.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-30" />
     <option name="width" value="1401" />
     <option name="height" value="981" />
@@ -105,7 +102,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.experiment_2">
+  <component name="RunManager" selected="Python.experiment_3">
     <configuration name="experiment_1" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Offline Implementation and Experiments" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -137,6 +134,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/experiment_2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="experiment_3" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Offline Implementation and Experiments" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/experiment_3.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -183,11 +198,13 @@
       <item itemvalue="Python.waqar_1" />
       <item itemvalue="Python.lcgrand" />
       <item itemvalue="Python.experiment_2" />
+      <item itemvalue="Python.experiment_3" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.experiment_2" />
+        <item itemvalue="Python.experiment_3" />
         <item itemvalue="Python.experiment_1" />
+        <item itemvalue="Python.experiment_2" />
         <item itemvalue="Python.waqar_1" />
         <item itemvalue="Python.lcgrand" />
       </list>
@@ -208,14 +225,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14910227" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" order="8" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.48281786" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.45704466" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="9" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -294,27 +310,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../Problem Specification &amp; given codes/mmk.py">
+    <entry file="file://$PROJECT_DIR$/experiment_2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="942">
-          <caret line="201" lean-forward="true" selection-start-line="201" selection-end-line="201" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiment_1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1656">
-          <caret line="291" column="10" lean-forward="true" selection-start-line="291" selection-start-column="10" selection-end-line="291" selection-end-column="10" />
+        <state relative-caret-position="153">
+          <caret line="57" lean-forward="true" selection-start-line="57" selection-end-line="57" />
           <folding>
             <element signature="e#386#398#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiment_2.py">
+    <entry file="file://$PROJECT_DIR$/experiment_1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="251" column="17" selection-start-line="251" selection-start-column="17" selection-end-line="251" selection-end-column="17" />
+        <state relative-caret-position="364">
+          <caret line="283" lean-forward="true" selection-start-line="283" selection-end-line="283" />
+          <folding>
+            <element signature="e#386#398#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Problem Specification &amp; given codes/mmk.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-180">
+          <caret line="180" column="30" lean-forward="true" selection-start-line="180" selection-start-column="30" selection-end-line="180" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiment_3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="356" column="14" lean-forward="true" selection-start-line="356" selection-start-column="14" selection-end-line="356" selection-end-column="14" />
           <folding>
             <element signature="e#386#398#0" expanded="true" />
           </folding>
