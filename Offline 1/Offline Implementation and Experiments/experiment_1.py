@@ -18,7 +18,7 @@ BUSY=1
 IDLE=0
 
 #total simulation time
-total_simulation_time=1000000
+total_simulation_time=10000
 
 # Parameters
 class Params:
@@ -70,8 +70,8 @@ class States:
         #update the statistical values
 
         #Compute time since last event, and update last-event-time- marker
-        time_since_last_event = sim.now() - self.time_last_event
-        self.time_last_event= sim.now()
+        time_since_last_event = event.eventTime - self.time_last_event
+        self.time_last_event= event.eventTime
 
         #Update area under number-in-queue function
         self.area_num_in_q += self.num_in_q * time_since_last_event
