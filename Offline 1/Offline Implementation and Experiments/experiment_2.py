@@ -154,7 +154,7 @@ class ExitEvent(Event):
     def process(self, sim):
         #exit event is scheduled in the start event already
         time_now= self.eventTime
-        print("This is the Exit Event at time: ", time_now)
+        #print("This is the Exit Event at time: ", time_now)
 
 
 

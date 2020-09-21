@@ -39,7 +39,6 @@ class Params:
         D= l / (m * (m-l))
         U= l/m
 
-        print()
         print('Analytical Results:')
         print('MMk Average queue length: %lf' % (L))
         print('MMk Average customer delay in queue: %lf' % (D))
@@ -330,9 +329,12 @@ def experiment3():
         sim.run()
 
         length, delay, utl = sim.getResults()
-        sim.printResults()
-        print()
 
+        print("----------------------------")
+        sim.printanalyticalResults()
+        print()
+        sim.printResults()
+        print("----------------------------")
         avglength.append(length)
         avgdelay.append(delay)
         util.append(utl)

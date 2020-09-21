@@ -23,10 +23,10 @@ total_simulation_time=10000
 # Parameters
 class Params:
     def __init__(self, lambd, mu, k):
-        self.lambd = lambd  # interarrival rate
+        self.lambd = lambd  #interarrival rate
         self.mu = mu  # service rate
         self.k = k
-    # Note lambd and mu are not mean value, they are rates i.e. (1/mean)
+    # Note lambda and mu are not mean value, they are rates i.e. (1/mean)
 
     def analyticalResults(self):
 
@@ -248,7 +248,7 @@ class Simulator:
             time, event = heapq.heappop(self.eventQ)
 
             if event.eventType == 'EXIT':
-                print(event.eventTime, 'Event', event)
+                #print(event.eventTime, 'Event', event)
                 self.simclock = event.eventTime
                 event.process(self)
                 print()
@@ -257,7 +257,7 @@ class Simulator:
             if self.states != None:
                 self.states.update(self, event)
 
-            print(event.eventTime, 'Event', event)
+            #print(event.eventTime, 'Event', event)
             self.simclock = event.eventTime
             event.process(self)
 
