@@ -56,10 +56,10 @@ class States:
         #now there will be K queues. Initially all the queue's length will be zero
         self.queues=[]
 
-        for i in range(k):
+        for i in range(self.k):
             server_own_queue =[]
-            server_own_queue.append(0.0)
             self.queues.append(server_own_queue)
+
 
         # an array of k servers and every server is IDLE initially
         self.server_array = []
@@ -201,11 +201,11 @@ class ArrivalEvent(Event):
             sim.states.num_in_q += 1
             #find the left most shortest queue
             index=0
-            temp_length= len(sim.states.queues[0])
+            temp_length = len(sim.states.queues[0])
 
             for i in range(sim.params.k):
-                if(len(sim.states.queues[i]) < temp_length):
-                    temp_length = sim.states.queues[i]
+                if ( len(sim.states.queues[i])) < temp_length:
+                    temp_length = len(sim.states.queues[i])
                     index =i
 
             #found the shortest queue. Now put the event time in that queue
@@ -233,27 +233,40 @@ class DepartureEvent(Event):
         self.server_no = server_no
 
     def process(self, sim):
-        # check whether the queue is empty. If empty then make that particular server IDLE
-        if (sim.states.num_in_q == 0):
-            sim.states.server_array[self.server_no] = IDLE
+        # check whether the queue of the service giving server is empty. If not empty then make that particular server serve someone
+        # from the queue.
 
-        else:
-            # decrease the number of people in queue
-            sim.states.num_in_q -= 1
-
-            # compute the delay
-            delay = sim.now() - sim.states.queue[0]
+        if(len(sim.states.queues[self.server_no])!= 0):
+            temp_t = sim.states.queues[self.server_no].pop(0)
+            delay = self.eventTime - temp_t
             sim.states.total_time_of_delays += delay
 
-            # remove the 1st customer from the waiting queue
-            sim.states.queue.pop(0)
+            #increament numbber of people served
+            sim.states.served+=1
 
-            # increment the num of customer served
-            sim.states.served += 1
-
-            # schedule the departure of the customer
+            # make a depart event for the service holder
             time = sim.now() + expon(sim.params.mu)
             sim.scheduleEvent(DepartureEvent(time, sim, self.server_no))
+
+
+        if(self.server_no - 1 >= 0 and len(sim.states.queues[self.server_no-1])!=0 ):
+            while True:
+                 # if the difference is less than 2 then break the loop
+                if( len(sim.states.queues[self.server_no - 1]) - len(sim.states.queues[self.server_no]) < 2):
+                    break;
+                #pop from the queue of previous server queue and append to the onging server queue
+                temp= sim.states.queues[self.server_no -1].pop()
+                sim.states.queues[self.server_no].append(temp)
+
+        if (self.server_no + 1 < sim.params.k and len(sim.states.queues[self.server_no + 1]) != 0):
+            while True:
+                # if the difference is less than 2 then break the loop
+                if (len(sim.states.queues[self.server_no + 1]) - len(sim.states.queues[self.server_no]) < 2):
+                    break;
+
+                # pop from the queue of previous server queue and append to the onging server queue
+                temp = sim.states.queues[self.server_no + 1].pop()
+                sim.states.queues[self.server_no].append(temp)
 
 
 class Simulator:
@@ -336,32 +349,32 @@ def experiment3():
 
         length, delay, utl = sim.getResults()
 
-        # print("----------------------------")
-        # sim.printanalyticalResults()
-        # print()
-        # sim.printResults()
-        # print("----------------------------")
+        print("----------------------------")
+        sim.printanalyticalResults()
+        print()
+        sim.printResults()
+        print("----------------------------")
         avglength.append(length)
         avgdelay.append(delay)
         util.append(utl)
 
-    # plt.figure(1)
-    # plt.subplot(311)
-    # plt.plot(k_arr, avglength)
-    # plt.xlabel('K')
-    # plt.ylabel('Avg Q length')
-    #
-    # plt.subplot(312)
-    # plt.plot(k_arr, avgdelay)
-    # plt.xlabel('K')
-    # plt.ylabel('Avg Q delay (sec)')
-    #
-    # plt.subplot(313)
-    # plt.plot(k_arr, util)
-    # plt.xlabel('K')
-    # plt.ylabel('Util')
-    #
-    # plt.show()
+    plt.figure(1)
+    plt.subplot(311)
+    plt.plot(k_arr, avglength)
+    plt.xlabel('K')
+    plt.ylabel('Avg Q length')
+
+    plt.subplot(312)
+    plt.plot(k_arr, avgdelay)
+    plt.xlabel('K')
+    plt.ylabel('Avg Q delay (sec)')
+
+    plt.subplot(313)
+    plt.plot(k_arr, util)
+    plt.xlabel('K')
+    plt.ylabel('Util')
+
+    plt.show()
 
 
 def main():
