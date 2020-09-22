@@ -198,7 +198,6 @@ class ArrivalEvent(Event):
 
         # all servers are busy. So wait in the leftmost shortest queue
         if (busy_check == sim.params.k):
-            sim.states.num_in_q += 1
             #find the left most shortest queue
             index=0
             temp_length = len(sim.states.queues[0])
@@ -210,6 +209,9 @@ class ArrivalEvent(Event):
 
             #found the shortest queue. Now put the event time in that queue
             sim.states.queues[index].append(self.eventTime)
+
+            # increase the number of people in queue
+            sim.states.num_in_q += 1
 
         # got an IDLE server
         else:
@@ -233,11 +235,16 @@ class DepartureEvent(Event):
         self.server_no = server_no
 
     def process(self, sim):
-        # check whether the queue of the service giving server is empty. If not empty then make that particular server serve someone
-        # from the queue.
+        # check whether the queue of the service giving server is empty or not. If not empty then make that particular server serve someone
+        # from the queue. If the server queue is empty than make that server idle.
 
         if(len(sim.states.queues[self.server_no])!= 0):
             temp_t = sim.states.queues[self.server_no].pop(0)
+
+            # decrease the number of people in queue
+            sim.states.num_in_q -= 1
+
+            #calculate the delay
             delay = self.eventTime - temp_t
             sim.states.total_time_of_delays += delay
 
@@ -247,6 +254,8 @@ class DepartureEvent(Event):
             # make a depart event for the service holder
             time = sim.now() + expon(sim.params.mu)
             sim.scheduleEvent(DepartureEvent(time, sim, self.server_no))
+        else:
+            sim.states.server_array[self.server_no] = IDLE
 
 
         if(self.server_no - 1 >= 0 and len(sim.states.queues[self.server_no-1])!=0 ):
@@ -267,6 +276,27 @@ class DepartureEvent(Event):
                 # pop from the queue of previous server queue and append to the onging server queue
                 temp = sim.states.queues[self.server_no + 1].pop()
                 sim.states.queues[self.server_no].append(temp)
+
+        #now check again if there is someone to be served after the queue changing
+        for i in range(sim.params.k):
+            if(sim.states.server_array[i] == IDLE):
+                if(len(sim.states.queues[i]) != 0):
+                    temp_t = sim.states.queues[i].pop(0)
+
+                    # decrease the number of people in queue
+                    sim.states.num_in_q -= 1
+
+                    #calculate delay
+                    delay = self.eventTime - temp_t
+                    sim.states.total_time_of_delays += delay
+
+                    # increament numbber of people served
+                    sim.states.served += 1
+
+                    # make a depart event for the service holder
+                    time = sim.now() + expon(sim.params.mu)
+                    sim.scheduleEvent(DepartureEvent(time, sim, i))
+
 
 
 class Simulator:
@@ -325,7 +355,7 @@ class Simulator:
         self.params.analyticalResults()
 
 
-def experiment3():
+def experiment4():
     # Similar to experiment2 but for different values of k; 1, 2, 3, 4
     # Generate the same plots
     # Fix lambd = (5.0/60), mu = (8.0/60) and change value of k
@@ -378,7 +408,7 @@ def experiment3():
 
 
 def main():
-    experiment3()
+    experiment4()
 
 
 if __name__ == "__main__":
