@@ -10,6 +10,10 @@ numOfMachinesPerStations =[]
 interArrivalTimeforJobsMean=0.0
 numOfJobTypes=0
 jobProbabilities=[]
+numOfStationForEachJob =[]
+#dictionary for keeping each job's station routing and mean service time for each station
+stationRouting ={}
+meanServiceTimeForEachStation ={}
 
 
 
@@ -285,6 +289,7 @@ class Simulator:
 
 def jobShopModel():
     global numOfStations,numOfMachinesPerStations,interArrivalTimeforJobsMean,numOfJobTypes,jobProbabilities
+    global numOfStationForEachJob,stationRouting,meanServiceTimeForEachStation
 
     # first read the input file and fillup different variables
     f= open("jobshop_input.txt","r")
@@ -309,7 +314,38 @@ def jobShopModel():
     for i in range(numOfJobTypes):
         jobProbabilities[i] = float(jobProbabilities[i])
 
+    numOfStationForEachJob = lines[5].split()
+    for i in range(numOfJobTypes):
+        numOfStationForEachJob[i] = int (numOfStationForEachJob[i])
 
+    lineNumber=6
+
+    for i in range(numOfJobTypes):
+        #working of station routing
+        tempJobStationRouting = lines[lineNumber].split()
+
+        for j in range(numOfStationForEachJob[i]):
+            tempJobStationRouting[j] = int(tempJobStationRouting[j])
+
+        stationRouting[i] = tempJobStationRouting
+
+        #working of mean service time for each station
+        tempMeanServiceTimeForStations = lines[lineNumber+1].split()
+
+        for j in range(numOfStationForEachJob[i]):
+            tempMeanServiceTimeForStations[j] = float(tempMeanServiceTimeForStations[j])
+
+        meanServiceTimeForEachStation[i] = tempMeanServiceTimeForStations
+        lineNumber = lineNumber + 2
+
+    print('number of stations: ', numOfStations)
+    print('number of machines per station: ',numOfMachinesPerStations)
+    print('inter arrival time for jobs: ',interArrivalTimeforJobsMean)
+    print('number of job types: ',numOfJobTypes)
+    print('job probabilities: ', jobProbabilities)
+    print('number of station for each jon: ', numOfStationForEachJob)
+    print('routing of the jobs: ',stationRouting)
+    print('mean service time for each station: ', meanServiceTimeForEachStation)
 
 def main():
     jobShopModel()
@@ -317,3 +353,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

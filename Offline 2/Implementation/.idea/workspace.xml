@@ -14,8 +14,8 @@
       <file leaf-file-name="1505113_JobShopModel.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/1505113_JobShopModel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="397">
-              <caret line="310" lean-forward="true" selection-start-line="310" selection-end-line="310" />
+            <state relative-caret-position="517">
+              <caret line="355" lean-forward="true" selection-start-line="355" selection-end-line="355" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -23,18 +23,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="1505113.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../Pattern-Recognition-4-2/offline 1 (Parceptron)/Implementation/1505113.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-480" />
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="waqar_jobshop.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/OneDrive/Desktop/Offline Helping/simulation/waqar_jobshop.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="279">
-              <caret line="273" lean-forward="true" selection-start-line="273" selection-end-line="273" />
+            <state relative-caret-position="600">
+              <caret line="288" column="23" selection-start-line="288" selection-start-column="8" selection-end-line="288" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -86,6 +79,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file://C:/Users/Acer/OneDrive/Desktop/Offline Helping/simulation/waqar_jobshop.py" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -170,7 +164,7 @@
       <window_info anchor="bottom" id="Find" order="5" weight="0.32965517" />
       <window_info anchor="bottom" id="Version Control" order="3" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" order="0" />
-      <window_info anchor="bottom" id="Run" order="6" weight="0.35448277" />
+      <window_info anchor="bottom" id="Run" order="6" weight="0.46758622" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="1" />
       <window_info id="Favorites" order="0" side_tool="true" />
@@ -206,20 +200,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../../../Pattern-Recognition-4-2/offline 1 (Parceptron)/Implementation/1505113.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-480" />
+        <state relative-caret-position="-7" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/OneDrive/Desktop/Offline Helping/simulation/waqar_jobshop.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="273" lean-forward="true" selection-start-line="273" selection-end-line="273" />
+        <state relative-caret-position="600">
+          <caret line="288" column="23" selection-start-line="288" selection-start-column="8" selection-end-line="288" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/1505113_JobShopModel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="397">
-          <caret line="310" lean-forward="true" selection-start-line="310" selection-end-line="310" />
+        <state relative-caret-position="517">
+          <caret line="355" lean-forward="true" selection-start-line="355" selection-end-line="355" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
