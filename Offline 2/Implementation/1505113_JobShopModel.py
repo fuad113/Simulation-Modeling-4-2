@@ -2,6 +2,7 @@ import heapq
 import random
 import math
 import lcgrand as lg
+import numpy as np
 
 #global variables for different parameters
 numOfStations=0
@@ -30,10 +31,6 @@ def erlang(mean):
     ex2 = expon(mean/2)
     return ex1 + ex2
 
-#status of the machine IDLE or BUSY
-BUSY=1
-IDLE=0
-
 
 # States and statistical counters
 class States:
@@ -48,7 +45,7 @@ class States:
         #busy machine counter. this array counts the number of busy machines of a station.
         self.numOfBusyMachines =[]
         for i in range(numOfStations):
-            self.numOfStations.append(0)
+            self.numOfBusyMachines.append(0)
 
         #serving counter. It counts every station's completed work number
         self.everyStationServed=[]
@@ -88,6 +85,9 @@ class States:
         for i in range(numOfJobTypes):
             self.jobCounter.append(0)
 
+        #counting on average how many jobs were in the system
+        self.avgNumOfJobsInSystem = 0.0
+
         #average delay of every job types
         self.avgDelayPerJob=[]
         for i in range(numOfJobTypes):
@@ -95,9 +95,6 @@ class States:
 
         # total average delay
         self.avgTotalJobDelay = 0.0
-
-        #counting on average how many jobs were in the system
-        self.avgNumOfJobsInSystem = 0.0
 
         #---------------------------------------------------------------------------------------------------------------
 
@@ -134,7 +131,7 @@ class States:
         #average dealay for each of the jobs
         for i in range(numOfJobTypes):
             if (self.jobCounter[i] != 0):
-                self.avgDelayPerJob[i] = self.avgDelayPerJob / self.jobCounter[i]
+                self.avgDelayPerJob[i] = self.avgDelayPerJob[i] / self.jobCounter[i]
 
         #calculating overall total delays
         for i in range(numOfJobTypes):
@@ -143,6 +140,9 @@ class States:
         #calculating average num of jobs done in the system
         self.avgNumOfJobsInSystem = self.avgNumOfJobsInSystem / sim.now()
         #---------------------------------------------------------------------------------------------------------------
+
+        return self.avgDelayInQueue,self.avgQueueLength,self.avgDelayPerJob,self.avgTotalJobDelay,self.avgNumOfJobsInSystem
+
 
 class Event:
     def __init__(self, sim):
@@ -164,9 +164,25 @@ class StartEvent(Event):
         self.sim = sim
 
     def process(self, sim):
-        None
+        #schedule the 1st arrival in the job shop
+        arrivalTime = self.eventTime + expon(interArrivalTimeforJobsMean)
 
+        #now randomly choosing one job from job types array
+        jobTypearray =[]
+        for i in range(numOfJobTypes):
+            jobTypearray.append(i)
 
+        tempjobNo = np.random.choice(jobTypearray , 1 , jobProbabilities)
+        jobType = tempjobNo[0]
+
+        #find out the 1st station of that job type
+        firstStationOfTheJob = stationRouting[jobType][0]
+
+        #schedule the first arrival event
+        self.sim.scheduleEvent(ArrivalEvent(arrivalTime, self.sim, jobType, firstStationOfTheJob))
+
+        #schedule the Exit event here
+        self.sim.scheduleEvent(ExitEvent(simulationHour,self.sim))
 
 class ExitEvent(Event):
     def __init__(self, eventTime, sim):
@@ -175,26 +191,72 @@ class ExitEvent(Event):
         self.sim = sim
 
     def process(self, sim):
-        None
-
+        #The exit event is processed in the arrival event
+        print("The simulation is end")
 
 
 class ArrivalEvent(Event):
-    def __init__(self, eventTime, sim):
+    def __init__(self, eventTime, sim, jobType, stationNo):
         self.eventTime = eventTime
         self.eventType = 'ARRIVAL'
         self.sim = sim
-
+        self.jobType =jobType
+        self.stationNo =stationNo
 
     def process(self, sim):
-        None
+        #schedule the next arrival. The next arrival will happen when the current arrival is at
+        #its 1st station
+        if(self.stationNo == stationRouting[self.jobType][0]):
+            arrivalTime = sim.now() + expon(interArrivalTimeforJobsMean)
+            # now randomly choosing one job from job types array
+            jobTypearray = []
+            for i in range(numOfJobTypes):
+                jobTypearray.append(i)
+
+            tempjobNo = np.random.choice(jobTypearray, 1, jobProbabilities)
+            jobType = tempjobNo[0]
+
+            # find out the 1st station of that job type
+            firstStationOfTheJob = stationRouting[jobType][0]
+
+            # schedule the first arrival event
+            sim.scheduleEvent(ArrivalEvent(arrivalTime, sim, jobType, firstStationOfTheJob))
+
+            #now increase te job counter because of the current job
+            sim.states.jobCounter[self.jobType] += 1
+            sim.states.numOfOngoingJobsInTheSystem +=1
+
+        #processing the current arrival event
+        #checking if every machine of the station is busy or not. If every machine of
+        #a station is busy then push the job in the queue of that station.
+        if(sim.states.numOfBusyMachines[self.stationNo] == numOfMachinesPerStations[self.stationNo]):
+            sim.states.queue[self.stationNo].append(self)
+        else:
+            #increase the number of busy machine
+            sim.states.numOfBusyMachines[self.stationNo] += 1
+
+            #schedule the departure of this job from this station
+            #findout the station index number for the job routing
+            jobRoutingStations = stationRouting[self.jobType]
+            index =0
+            for i in range(len(jobRoutingStations)):
+                if(jobRoutingStations[i] == self.stationNo):
+                    index = i
+                    break
+
+            temp = erlang(meanServiceTimeForEachStation[self.jobType][index])
+            departureTime = sim.now() + temp
+            sim.scheduleEvent(DepartureEvent(departureTime , sim , self.jobType , self.stationNo ))
+
 
 
 class DepartureEvent(Event):
-    def __init__(self, eventTime, sim,server_no):
+    def __init__(self, eventTime, sim , jobType , stationNo):
         self.eventTime = eventTime
         self.eventType = 'DEPARTURE'
         self.sim = sim
+        self.jobType = jobType
+        self.stationNo = stationNo
 
 
     def process(self, sim):
@@ -202,19 +264,16 @@ class DepartureEvent(Event):
 
 
 class Simulator:
-    def __init__(self, seed):
+    def __init__(self):
         self.eventQ = []
         self.simclock = 0
-        self.states = None
+        self.states = States()
 
     def initialize(self):
         self.simclock = 0
         self.scheduleEvent(StartEvent(0, self))
         lg.resetzrng()
 
-    def configure(self, params, states):
-        self.params = params
-        self.states = states
 
     def now(self):
         return self.simclock
@@ -223,7 +282,6 @@ class Simulator:
         heapq.heappush(self.eventQ, (event.eventTime, event))
 
     def run(self):
-        random.seed(self.seed)
         self.initialize()
 
         while len(self.eventQ) > 0:
@@ -245,21 +303,13 @@ class Simulator:
 
         self.states.finish(self)
 
-    def printResults(self):
-        self.states.printResults(self)
-
-    def getResults(self):
-        return self.states.getResults(self)
-
-    def printanalyticalResults(self):
-        self.params.analyticalResults()
-
 
 
 def jobShopModel():
     global numOfStations,numOfMachinesPerStations,interArrivalTimeforJobsMean,numOfJobTypes,jobProbabilities
     global numOfStationForEachJob,stationRouting,meanServiceTimeForEachStation
 
+    #-------------------------------------------------------------------------------------------------------------------
     # first read the input file and fillup different variables
     f= open("jobshop_input.txt","r")
     lines = f.readlines()
@@ -315,6 +365,31 @@ def jobShopModel():
     print('number of station for each jon: ', numOfStationForEachJob)
     print('routing of the jobs: ',stationRouting)
     print('mean service time for each station: ', meanServiceTimeForEachStation)
+    #-------------------------------------------------------------------------------------------------------------------
+
+    #main calculation work of the simulation
+
+    #-------------------------------------------------------------------------------------------------------------------
+    #declaring the variables to hold the metrics from simulation
+    avgDelayInQueue = []
+    avgQueueLength = []
+    for i in range(numOfStations):
+        avgDelayInQueue.append(0.0)
+        avgQueueLength.append(0.0)
+
+    avgDelayPerJob = []
+    for i in range(numOfJobTypes):
+        avgDelayPerJob.append(0.0)
+
+    avgTotalJobDelay = 0.0
+    avgNumOfJobsInSystem = 0.0
+    #-------------------------------------------------------------------------------------------------------------------
+
+    #-------------------------------------------------------------------------------------------------------------------
+    #running the simulation
+
+    sim = Simulator()
+    #avgDelayInQueue,avgQueueLength,avgDelayPerJob,avgTotalJobDelay,avgNumOfJobsInSystem = sim.run()
 
 def main():
     jobShopModel()
