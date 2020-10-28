@@ -376,7 +376,7 @@ def jobShopModel():
 
     #-------------------------------------------------------------------------------------------------------------------
     # first read the input file and fillup different variables
-    f= open("jobshop_input.txt","r")
+    f= open("Job Shop Model Input.txt","r")
     lines = f.readlines()
     f.close()
 
@@ -437,31 +437,90 @@ def jobShopModel():
     print('number of station for each job: ', numOfStationForEachJob)
     print('routing of the jobs: ',stationRouting)
     print('mean service time for each station: ', meanServiceTimeForEachStation)
+    print()
     #-------------------------------------------------------------------------------------------------------------------
 
     #main calculation work of the simulation
 
     #-------------------------------------------------------------------------------------------------------------------
     #declaring the variables to hold the metrics from simulation
-    avgDelayInQueue = []
-    avgQueueLength = []
-    for i in range(numOfStations):
-        avgDelayInQueue.append(0.0)
-        avgQueueLength.append(0.0)
+    finalAvgDelayInQueue = []
+    finalAvgQueueLength = []
+    for i in range(numOfStations+1):
+        finalAvgDelayInQueue.append(0.0)
+        finalAvgQueueLength.append(0.0)
 
-    avgDelayPerJob = []
-    for i in range(numOfJobTypes):
-        avgDelayPerJob.append(0.0)
+    finalAvgDelayPerJob = []
+    for i in range(numOfJobTypes+1):
+        finalAvgDelayPerJob.append(0.0)
 
-    avgTotalJobDelay = 0.0
-    avgNumOfJobsInSystem = 0.0
+    finalAvgTotalJobDelay = 0.0
+    finalAvgNumOfJobsInSystem = 0.0
     #-------------------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------------------------------------------------------------------------------
     #running the simulation
+    for i in range(simulationIteration):
 
-    sim = Simulator()
-    avgDelayInQueue,avgQueueLength,avgDelayPerJob,avgTotalJobDelay,avgNumOfJobsInSystem = sim.run()
+        sim = Simulator()
+        avgDelayInQueue,avgQueueLength,avgDelayPerJob,avgTotalJobDelay,avgNumOfJobsInSystem = sim.run()
+
+        #dealing withe queues of every station
+        for j in range(1, numOfStations+1 , 1):
+           finalAvgDelayInQueue[j] += avgDelayInQueue[j]
+           finalAvgQueueLength[j] += avgQueueLength[j]
+
+
+        #dealing with the Jobs
+        for j in range(1, numOfJobTypes+1 ,1):
+            finalAvgDelayPerJob[j] += avgDelayPerJob[j]
+
+        finalAvgTotalJobDelay += avgTotalJobDelay
+
+        finalAvgNumOfJobsInSystem += avgNumOfJobsInSystem
+    #-------------------------------------------------------------------------------------------------------------------
+
+
+    #-------------------------------------------------------------------------------------------------------------------
+    #calculating the average. because of more than 1 iterations
+    for i in range(1, numOfStations+1 ,1):
+        finalAvgDelayInQueue[i] /= simulationIteration
+        finalAvgQueueLength[i] /= simulationIteration
+
+    for i in range(1, numOfJobTypes+1 , 1):
+        finalAvgDelayPerJob[i] /= simulationIteration
+
+    finalAvgTotalJobDelay /= simulationIteration
+
+    finalAvgNumOfJobsInSystem /= simulationIteration
+    #-------------------------------------------------------------------------------------------------------------------
+
+    #-------------------------------------------------------------------------------------------------------------------
+    #generating report
+    output = open("Job Shop Model Output.txt" , "w")
+
+    output.write("Average Total Delay in Queue for Each Job Type\n")
+    output.write("------------------------------------------------\n")
+
+
+    for i in range(1, numOfJobTypes+1 , 1):
+        output.write("Job " + str(i) + " --> " + str(round(finalAvgDelayPerJob[i], 4)) + "\n" )
+
+    output.write("\nOverall Average Job Total Delay: " + str(round(finalAvgTotalJobDelay, 4)) + "\n" )
+
+    output.write("\nAverage Number in Each queue\n")
+    output.write("------------------------------\n")
+    for i in range(1, numOfStations+1 ,1):
+        output.write("Station " + str(i) + " Queue --> " + str(round(finalAvgQueueLength[i], 4)) + "\n" )
+
+    output.write("\nAverage Number of Jobs in the Whole System: " + str(round(finalAvgNumOfJobsInSystem, 4)) + "\n")
+
+    output.write("\nAverage Delay in Queue for Each Station\n")
+    output.write("-----------------------------------------\n")
+    for i in range(1, numOfStations+1 ,1):
+        output.write("Station " + str(i) + " Queue --> " + str(round(finalAvgDelayInQueue[i], 4)) + "\n" )
+
+    #-------------------------------------------------------------------------------------------------------------------
 
 def main():
     jobShopModel()
