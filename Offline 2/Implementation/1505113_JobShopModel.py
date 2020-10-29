@@ -16,8 +16,8 @@ stationRouting ={}
 meanServiceTimeForEachStation ={}
 
 
-#total simulation time
-simulationHour = 8
+#total simulation time.The duration is given in hour.
+simulationDuration = 8
 simulationIteration = 30
 
 
@@ -186,7 +186,7 @@ class StartEvent(Event):
         self.sim.scheduleEvent(ArrivalEvent(arrivalTime, self.sim, jobType, firstStationOfTheJob))
 
         #schedule the Exit event here
-        self.sim.scheduleEvent(ExitEvent(simulationHour,self.sim))
+        self.sim.scheduleEvent(ExitEvent(simulationDuration, self.sim))
 
 class ExitEvent(Event):
     def __init__(self, eventTime, sim):
