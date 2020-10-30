@@ -1,25 +1,25 @@
 Average Total Delay in Queue for Each Job Type
 ------------------------------------------------
-Job 1 --> 1.0087
-Job 2 --> 0.3544
-Job 3 --> 1.1096
+Job 1 --> 1.0804
+Job 2 --> 0.3371
+Job 3 --> 1.1693
 
-Overall Average Job Total Delay: 0.7017
+Overall Average Job Total Delay: 0.7266
 
 Average Number in Each queue
 ------------------------------
-Station 1 Queue --> 0.984
-Station 2 Queue --> 3.5991
-Station 3 Queue --> 0.0894
-Station 4 Queue --> 0.3643
-Station 5 Queue --> 0.2433
+Station 1 Queue --> 0.8171
+Station 2 Queue --> 3.3401
+Station 3 Queue --> 0.0696
+Station 4 Queue --> 0.5781
+Station 5 Queue --> 0.3205
 
-Average Number of Jobs in the Whole System: 13.0264
+Average Number of Jobs in the Whole System: 12.648
 
 Average Delay in Queue for Each Station
 -----------------------------------------
-Station 1 Queue --> 0.2928
-Station 2 Queue --> 1.5264
-Station 3 Queue --> 0.0313
-Station 4 Queue --> 0.179
-Station 5 Queue --> 0.128
+Station 1 Queue --> 0.2546
+Station 2 Queue --> 1.4438
+Station 3 Queue --> 0.0221
+Station 4 Queue --> 0.2614
+Station 5 Queue --> 0.2127
