@@ -15,17 +15,13 @@ simulationDuration = 90*60
 
 counters = ["hotfood" , "sandwich" , "drinks" ]
 NoOfCustomerType =3
+customerType = [1,2,3]
 customerTypewiseRouting = {
     "1" : ["hotfood" , "drinks" , "cash"],
     "2" : ["sandwich" , "drinks" , "cash"],
     "3" : ["drinks" , "cash"]
 }
-
-cutomerTypeProbabilities ={
-    "1" : 0.8,
-    "2" : 0.15,
-    "3" : 0.05
-}
+cutomerTypeProbabilities = [0.80 , 0.15 , 0.05]
 
 
 counterSTMap = {
@@ -42,6 +38,10 @@ counterACTMap = {
 
 employeeCounter = {}
 
+groupID = 0
+
+#a map for controlling the new arrival in the arrival event
+arrivalMap = {}
 
 #expon function
 def expon(mean):
@@ -186,14 +186,14 @@ class States:
 
         #update the value of average queue length
 
-        for key in range(self.avgQLength):
+        for key in self.avgQLength:
             numOfQueues = len(self.queue[key])
             qCounter =0
             for i in range(len(self.queue[key])):
                 currentQueueLength = len(self.queue[key][i])
                 qCounter += currentQueueLength
                 self.maxQLength[key] = max( self.maxQLength[key] , currentQueueLength )
-            self.avgQLength += (qCounter/numOfQueues) * time_since_last_event
+            self.avgQLength[key] += (qCounter/numOfQueues) * time_since_last_event
 
 
         #update the customer numbers in the system
@@ -206,13 +206,14 @@ class States:
         #Calculation for the Queues
         #calculation of average queue length
 
-        for key in range(self.avgQLength):
+        for key in self.avgQLength:
             self.avgQLength[key] /= sim.now()
 
         #calculation for the avg queue delay
-        for key in range(self.avgQDelay):
+        for key in self.avgQDelay:
             #division by 60 is for conversion to per minutes
-            self.avgQDelay[key] =  (self.avgQDelay[key]/self.cutomerServed[key]) / 60
+            if(self.customerServed[key] != 0):
+                self.avgQDelay[key] =  (self.avgQDelay[key]/self.customerServed[key]) / 60
 
         #---------------------------------------------------------------------------------------------------------------
 
@@ -222,11 +223,12 @@ class States:
         for i in range (NoOfCustomerType):
 
             key = str(i+1)
-            self.avgCustomerTypewiseDelay[key] /= self.customerServedTypeWise[key]
+            if(self.customerServedTypeWise[key] != 0):
+                self.avgCustomerTypewiseDelay[key] /= self.customerServedTypeWise[key]
             # division by 60 is for conversion to per minutes
             self.avgCustomerTypewiseDelay[key] /= 60
             self.avgCustomerTypewiseDelay[key] = round(self.avgCustomerTypewiseDelay[key] , 3 )
-            self.overallAvgDelay += self.avgCustomerTypewiseDelay[key]
+            self.overallAvgDelay += self.avgCustomerTypewiseDelay[key] * cutomerTypeProbabilities[i]
 
         #---------------------------------------------------------------------------------------------------------------
 
@@ -239,10 +241,10 @@ class States:
 
         #---------------------------------------------------------------------------------------------------------------
         #rounding each values to precision 3
-        for key in range(self.avgQLength):
+        for key in self.avgQLength:
             self.avgQLength[key] = round(self.avgQLength[key], 3 )
 
-        for key in range(self.avgQDelay):
+        for key in self.avgQDelay:
             self.avgQDelay[key] = round(self.avgQDelay[key], 3)
 
         self.overallAvgDelay = round(self.overallAvgDelay, 3)
@@ -297,7 +299,6 @@ class States:
         print("Overall Average Delay: " , self.overallAvgDelay)
 
 
-
 class Event:
     def __init__(self, sim):
         self.eventType = None
@@ -310,6 +311,10 @@ class Event:
     def __repr__(self):
         return self.eventType
 
+    #this is for the comparion on the heap.
+    def __lt__(self, other):
+        return True
+
 
 class StartEvent(Event):
     def __init__(self, eventTime, sim):
@@ -318,7 +323,30 @@ class StartEvent(Event):
         self.sim = sim
 
     def process(self, sim):
-        None
+        global groupID
+
+        #creating the first arrival
+        arrivalTime = sim.now() + expon(interArrivalTimeBetweenGroups)
+        #assigning this group a group ID
+        groupID+=1
+        #determining the group size of th customer
+        groupSize = np.random.choice(groupSizes, p=groupSizeProbabilities)
+
+
+        #now processing each customer of the group
+        for i in range(groupSize):
+            #findout which customer type he/she is
+            tempCustomerType = np.random.choice(customerType , p=cutomerTypeProbabilities)
+            #increase te counter of that type of customer by 1
+            sim.states.customerServedTypeWise[str(tempCustomerType)] += 1
+            #find the first counter name of this type of customer
+            firstCounter = customerTypewiseRouting[str(tempCustomerType)][0]
+            #now create an arrival event for this customer
+            sim.scheduleEvent(ArrivalEvent( arrivalTime ,sim , groupID ,tempCustomerType ,firstCounter ,0))
+
+        #schedule the exit event of the simulation
+        sim.scheduleEvent(ExitEvent(simulationDuration,sim))
+
 
 class ExitEvent(Event):
     def __init__(self, eventTime, sim):
@@ -332,22 +360,134 @@ class ExitEvent(Event):
 
 
 class ArrivalEvent(Event):
-    def __init__(self, eventTime, sim):
+    def __init__(self, eventTime, sim , groupID , customerType , currentCounter , queueNo):
         self.eventTime = eventTime
         self.eventType = 'ARRIVAL'
         self.sim = sim
+        self.groupID = groupID
+        self.customerType = customerType
+        self.currentCounter = currentCounter
+        self.queueNo = queueNo
 
 
     def process(self, sim):
-        None
+        #---------------------------------------------------------------------------------------------------------------
+        #if the customer is in the 1st counter of his/her route,then increament the Num of customers
+        #in the system
+        tempfirstcounter = customerTypewiseRouting[str(self.customerType)][0]
+        firstCounterFlag = False
+
+        if(tempfirstcounter == self.currentCounter):
+            #then it is the first counter for the new customer.
+            #increase the current number of people in the system
+            sim.states.currentCustomersIntheSystem+=1
+            firstCounterFlag =True
+
+        #---------------------------------------------------------------------------------------------------------------
+
+
+        #---------------------------------------------------------------------------------------------------------------
+        #Schedule the arrival of the next group
+        if( self.groupID not in arrivalMap and firstCounterFlag==True ):
+            #mark on going processed group true to avoid too many arrival
+            arrivalMap[self.groupID] = True
+
+            #now create new arrival
+            arrivalTime = self.eventTime + expon(interArrivalTimeBetweenGroups)
+            # assigning this group a group ID
+            newgroupID = self.groupID + 1
+            # determining the group size of th customer
+            groupSize = np.random.choice(groupSizes, p=groupSizeProbabilities)
+
+            # now processing each customer of the group
+            for i in range(groupSize):
+                # findout which customer type he/she is
+                tempCustomerType = np.random.choice(customerType, p=cutomerTypeProbabilities)
+                # increase te counter of that type of customer by 1
+                sim.states.customerServedTypeWise[str(tempCustomerType)] += 1
+                # find the first counter name of this type of customer
+                firstCounter = customerTypewiseRouting[str(tempCustomerType)][0]
+                # now create an arrival event for this customer
+                sim.scheduleEvent(ArrivalEvent(arrivalTime, sim, newgroupID, tempCustomerType, firstCounter, 0))
+        #---------------------------------------------------------------------------------------------------------------
+
+        #---------------------------------------------------------------------------------------------------------------
+        #Process the onging arrival event
+        #counters are free. so customer will get the service. No standing in queue
+        #the main target is to create the departure for this arrival
+        if( sim.states.serverAvailable[self.currentCounter] > 0):
+            #that is atleast 1 employee is available to serve the customer
+            sim.states.serverAvailable[self.currentCounter] -=1
+
+            #now figure out the service time of the counters
+            #normal food counter, use ST
+            #for cash counter use ACT
+            serviceTime = 0
+
+            if(self.currentCounter == "cash"):
+                for key in counterACTMap:
+                    if (key in customerTypewiseRouting[str(self.customerType)]):
+                        temp = np.random.uniform( counterACTMap[key][0] , counterACTMap[key][1] )
+                        serviceTime += temp
+            else:
+                serviceTime += np.random.uniform(counterSTMap[self.currentCounter][0] , counterSTMap[self.currentCounter][1])
+
+            #schedule the departure time
+            departtime = self.eventTime + serviceTime
+
+            #now determine the queue
+            #for food counters queue index will be always 0
+            #but for cash counter there can be multiple queue
+            queueNo =0
+
+            noOfQueueInCashServer = len(sim.states.cashServer)
+
+            if( self.currentCounter == "cash" ):
+                for i in range(noOfQueueInCashServer):
+                    if(sim.states.cashServer[i] == 0):
+                        sim.states.cashServer[i] =1
+                        queueNo = i
+
+            #increament the no of customer served in the counter
+            sim.states.customerServed[self.currentCounter] +=1
+
+            #schedule the departure event
+            sim.scheduleEvent(DepartureEvent(departtime , sim , self.groupID , self.customerType ,
+                                             self.currentCounter , queueNo ))
+
+        else:
+            #counter is busy. so customer have to stand in queue
+            #for the cash counter there will be multiple queues
+            #find the shortest queue to stant
+
+            queueNo = 0
+            min =np.inf
+            nofqueueInCounter = len(sim.states.queue[self.currentCounter])
+
+            for i in range(nofqueueInCounter):
+                queuelen = len(sim.states.queue[self.currentCounter][i])
+                if(queuelen < min):
+                    min = queuelen
+                    queueNo = i
+
+            self.queueNo = queueNo
+
+            #append to the counter queue
+            sim.states.queue[self.currentCounter][queueNo].append(self)
+
+        #---------------------------------------------------------------------------------------------------------------
 
 
 
 class DepartureEvent(Event):
-    def __init__(self, eventTime, sim ):
+    def __init__(self, eventTime, sim , groupID , customerType , currentCounter , queueNo ):
         self.eventTime = eventTime
         self.eventType = 'DEPARTURE'
         self.sim = sim
+        self.groupID = groupID
+        self.customerType = customerType
+        self.currentCounter = currentCounter
+        self.queueNo = queueNo
 
 
     def process(self, sim):
@@ -392,7 +532,9 @@ class Simulator:
             self.simclock = event.eventTime
             event.process(self)
 
-        return self.states.finish(self)
+        self.states.finish(self)
+        self.states.results()
+
 
 
 
@@ -471,6 +613,13 @@ def cafeteriaModel(index):
     print("Employee Counters:",employeeCounter)
     print("ST map: ", counterSTMap)
     print("ACT map: " ,counterACTMap)
+
+    #-------------------------------------------------------------------------------------------------------------------
+    seed = 1
+    np.random.seed(seed)
+    #run the simulator
+    sim =Simulator()
+    sim.run()
 
 
 def main():
