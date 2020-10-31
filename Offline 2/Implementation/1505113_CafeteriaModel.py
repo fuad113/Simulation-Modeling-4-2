@@ -43,6 +43,9 @@ groupID = 0
 #a map for controlling the new arrival in the arrival event
 arrivalMap = {}
 
+busy=1
+idle=0
+
 #expon function
 def expon(mean):
     return  -mean * math.log(lg.lcgrand(1))
@@ -76,7 +79,7 @@ class States:
             "hotfood" : [hotfoodQueue],
             "sandwich" : [sandwichQueue],
             "drinks" : [drinksQueue],
-            "cash" : [cashQueue]
+            "cash" : cashQueue
         }
         #---------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +103,7 @@ class States:
         #because there can be more than 1 queue in the cash counter
         self.cashServer =[]
         for i in range(cashServers):
-            self.cashServer.append(0)
+            self.cashServer.append(idle)
         #---------------------------------------------------------------------------------------------------------------
 
         #---------------------------------------------------------------------------------------------------------------
@@ -444,9 +447,10 @@ class ArrivalEvent(Event):
 
             if( self.currentCounter == "cash" ):
                 for i in range(noOfQueueInCashServer):
-                    if(sim.states.cashServer[i] == 0):
-                        sim.states.cashServer[i] =1
+                    if(sim.states.cashServer[i] == idle):
+                        sim.states.cashServer[i] = busy
                         queueNo = i
+                        break
 
             #increament the no of customer served in the counter
             sim.states.customerServed[self.currentCounter] +=1
@@ -491,8 +495,86 @@ class DepartureEvent(Event):
 
 
     def process(self, sim):
-        None
+        #---------------------------------------------------------------------------------------------------------------
+        #Check someone is in the queue or not of this counter.
+        #if someone is in the queue, process his/her departure
 
+        queueLen = len(sim.states.queue[self.currentCounter][self.queueNo])
+
+        if(queueLen > 0):
+            #someone is in the queue
+            queueObj = sim.states.queue[self.currentCounter][self.queueNo].pop(0)
+
+            #calculate the delay
+            timeDelayed = self.eventTime - queueObj.eventTime
+
+            #update the delay parameters
+            #update customer Typewise delay parameters
+            sim.states.avgCustomerTypewiseDelay[str(self.customerType)] += timeDelayed
+            sim.states.maxCustomerTypewiseDelay[str(self.customerType)] = \
+                max( sim.states.maxCustomerTypewiseDelay[str(self.customerType)] , timeDelayed)
+
+            #no delay for the drinks counter. because there is no queue here
+            if (self.currentCounter == "hotfood" or self.currentCounter == "sandwich"):
+                sim.states.avgQDelay[self.currentCounter] += timeDelayed
+                sim.states.maxQDelay[self.currentCounter] = max(sim.states.maxQDelay[self.currentCounter] , timeDelayed)
+
+            #schedule the departure of the queueObj
+            #now figure out the service time of the counters
+            #normal food counter, use ST
+            #for cash counter use ACT
+            serviceTime = 0
+
+            if(self.currentCounter == "cash"):
+                for key in counterACTMap:
+                    if (key in customerTypewiseRouting[str(queueObj.customerType)]):
+                        temp = np.random.uniform( counterACTMap[key][0] , counterACTMap[key][1] )
+                        serviceTime += temp
+            else:
+                serviceTime += np.random.uniform(counterSTMap[self.currentCounter][0] , counterSTMap[self.currentCounter][1])
+
+            #schedule the departure time
+            departtime = self.eventTime + serviceTime
+
+            #increase the counter wise served by one
+            sim.states.customerServed[queueObj.currentCounter] += 1
+
+            sim.scheduleEvent(DepartureEvent(departtime , sim , queueObj.groupID , queueObj.customerType,
+                                             queueObj.currentCounter , queueObj.queueNo))
+
+        else:
+            #no One is in the queue
+            #make the status of the free employee/server available
+            sim.states.serverAvailable[self.currentCounter] += 1
+
+            #if this counter is cash counter then free the cash server
+            if (self.currentCounter == "cash"):
+                sim.states.cashServer[self.queueNo] = idle
+        #---------------------------------------------------------------------------------------------------------------
+
+        #---------------------------------------------------------------------------------------------------------------
+        #Now send the customer to the next counter
+        nextCounter = None
+
+        #figure out the next counter. if there is no next counter then the above variable will be none
+        counters = customerTypewiseRouting[str(self.customerType)]
+
+        thisCounterIndex=0
+        for i in range(len(counters)):
+            if(counters[i] == self.currentCounter):
+                thisCounterIndex = i
+                break
+
+        if(thisCounterIndex == (len(counters)-1)):
+            #this is the last counter
+            #decrease the value of the current customer in the system
+            sim.states.currentCustomersIntheSystem -= 1
+        else:
+            nextCounter= counters[thisCounterIndex+1]
+            #schedule arrival for the next counter
+            sim.scheduleEvent(ArrivalEvent(self.eventTime , sim , self.groupID, self.customerType,
+                                           nextCounter , 0))
+        #---------------------------------------------------------------------------------------------------------------
 
 class Simulator:
     def __init__(self):
@@ -534,8 +616,6 @@ class Simulator:
 
         self.states.finish(self)
         self.states.results()
-
-
 
 
 def cafeteriaModel(index):
@@ -624,7 +704,7 @@ def cafeteriaModel(index):
 
 def main():
     #give the index of the employee variation map to get the employee counter
-    cafeteriaModel(0)
+    cafeteriaModel(4)
 
 
 if __name__ == "__main__":
