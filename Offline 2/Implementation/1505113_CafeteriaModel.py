@@ -43,6 +43,7 @@ groupID = 0
 #a map for controlling the new arrival in the arrival event
 arrivalMap = {}
 
+#for cashServer status
 busy=1
 idle=0
 
@@ -100,7 +101,8 @@ class States:
 
         #---------------------------------------------------------------------------------------------------------------
         #special work for the cash counter.
-        #because there can be more than 1 queue in the cash counter
+        #because there can be more than 1 queue in the cash counter.
+        #initially all the cash server idle
         self.cashServer =[]
         for i in range(cashServers):
             self.cashServer.append(idle)
@@ -363,13 +365,13 @@ class ExitEvent(Event):
 
 
 class ArrivalEvent(Event):
-    def __init__(self, eventTime, sim , groupID , customerType , currentCounter , queueNo):
+    def __init__(self, eventTime, sim, groupID, customerType, counterName, queueNo):
         self.eventTime = eventTime
         self.eventType = 'ARRIVAL'
         self.sim = sim
         self.groupID = groupID
         self.customerType = customerType
-        self.currentCounter = currentCounter
+        self.counterName = counterName
         self.queueNo = queueNo
 
 
@@ -380,14 +382,13 @@ class ArrivalEvent(Event):
         tempfirstcounter = customerTypewiseRouting[str(self.customerType)][0]
         firstCounterFlag = False
 
-        if(tempfirstcounter == self.currentCounter):
+        if(tempfirstcounter == self.counterName):
             #then it is the first counter for the new customer.
             #increase the current number of people in the system
             sim.states.currentCustomersIntheSystem+=1
             firstCounterFlag =True
 
         #---------------------------------------------------------------------------------------------------------------
-
 
         #---------------------------------------------------------------------------------------------------------------
         #Schedule the arrival of the next group
@@ -418,22 +419,22 @@ class ArrivalEvent(Event):
         #Process the onging arrival event
         #counters are free. so customer will get the service. No standing in queue
         #the main target is to create the departure for this arrival
-        if( sim.states.serverAvailable[self.currentCounter] > 0):
+        if( sim.states.serverAvailable[self.counterName] > 0):
             #that is atleast 1 employee is available to serve the customer
-            sim.states.serverAvailable[self.currentCounter] -=1
+            sim.states.serverAvailable[self.counterName] -=1
 
             #now figure out the service time of the counters
             #normal food counter, use ST
             #for cash counter use ACT
             serviceTime = 0
 
-            if(self.currentCounter == "cash"):
+            if(self.counterName == "cash"):
                 for key in counterACTMap:
                     if (key in customerTypewiseRouting[str(self.customerType)]):
                         temp = np.random.uniform( counterACTMap[key][0] , counterACTMap[key][1] )
                         serviceTime += temp
             else:
-                serviceTime += np.random.uniform(counterSTMap[self.currentCounter][0] , counterSTMap[self.currentCounter][1])
+                serviceTime += np.random.uniform(counterSTMap[self.counterName][0], counterSTMap[self.counterName][1])
 
             #schedule the departure time
             departtime = self.eventTime + serviceTime
@@ -445,7 +446,7 @@ class ArrivalEvent(Event):
 
             noOfQueueInCashServer = len(sim.states.cashServer)
 
-            if( self.currentCounter == "cash" ):
+            if( self.counterName == "cash"):
                 for i in range(noOfQueueInCashServer):
                     if(sim.states.cashServer[i] == idle):
                         sim.states.cashServer[i] = busy
@@ -453,11 +454,11 @@ class ArrivalEvent(Event):
                         break
 
             #increament the no of customer served in the counter
-            sim.states.customerServed[self.currentCounter] +=1
+            sim.states.customerServed[self.counterName] +=1
 
             #schedule the departure event
-            sim.scheduleEvent(DepartureEvent(departtime , sim , self.groupID , self.customerType ,
-                                             self.currentCounter , queueNo ))
+            sim.scheduleEvent(DepartureEvent(departtime, sim, self.groupID, self.customerType,
+                                             self.counterName, queueNo))
 
         else:
             #counter is busy. so customer have to stand in queue
@@ -466,10 +467,10 @@ class ArrivalEvent(Event):
 
             queueNo = 0
             min =np.inf
-            nofqueueInCounter = len(sim.states.queue[self.currentCounter])
+            nofqueueInCounter = len(sim.states.queue[self.counterName])
 
             for i in range(nofqueueInCounter):
-                queuelen = len(sim.states.queue[self.currentCounter][i])
+                queuelen = len(sim.states.queue[self.counterName][i])
                 if(queuelen < min):
                     min = queuelen
                     queueNo = i
@@ -477,20 +478,20 @@ class ArrivalEvent(Event):
             self.queueNo = queueNo
 
             #append to the counter queue
-            sim.states.queue[self.currentCounter][queueNo].append(self)
+            sim.states.queue[self.counterName][self.queueNo].append(self)
 
         #---------------------------------------------------------------------------------------------------------------
 
 
 
 class DepartureEvent(Event):
-    def __init__(self, eventTime, sim , groupID , customerType , currentCounter , queueNo ):
+    def __init__(self, eventTime, sim, groupID, customerType, counterName, queueNo):
         self.eventTime = eventTime
         self.eventType = 'DEPARTURE'
         self.sim = sim
         self.groupID = groupID
         self.customerType = customerType
-        self.currentCounter = currentCounter
+        self.counterName = counterName
         self.queueNo = queueNo
 
 
@@ -499,11 +500,11 @@ class DepartureEvent(Event):
         #Check someone is in the queue or not of this counter.
         #if someone is in the queue, process his/her departure
 
-        queueLen = len(sim.states.queue[self.currentCounter][self.queueNo])
+        queueLen = len(sim.states.queue[self.counterName][self.queueNo])
 
         if(queueLen > 0):
             #someone is in the queue
-            queueObj = sim.states.queue[self.currentCounter][self.queueNo].pop(0)
+            queueObj = sim.states.queue[self.counterName][self.queueNo].pop(0)
 
             #calculate the delay
             timeDelayed = self.eventTime - queueObj.eventTime
@@ -515,9 +516,9 @@ class DepartureEvent(Event):
                 max( sim.states.maxCustomerTypewiseDelay[str(self.customerType)] , timeDelayed)
 
             #no delay for the drinks counter. because there is no queue here
-            if (self.currentCounter == "hotfood" or self.currentCounter == "sandwich"):
-                sim.states.avgQDelay[self.currentCounter] += timeDelayed
-                sim.states.maxQDelay[self.currentCounter] = max(sim.states.maxQDelay[self.currentCounter] , timeDelayed)
+            if (self.counterName == "hotfood" or self.counterName == "sandwich"):
+                sim.states.avgQDelay[self.counterName] += timeDelayed
+                sim.states.maxQDelay[self.counterName] = max(sim.states.maxQDelay[self.counterName], timeDelayed)
 
             #schedule the departure of the queueObj
             #now figure out the service time of the counters
@@ -525,30 +526,30 @@ class DepartureEvent(Event):
             #for cash counter use ACT
             serviceTime = 0
 
-            if(self.currentCounter == "cash"):
+            if(self.counterName == "cash"):
                 for key in counterACTMap:
                     if (key in customerTypewiseRouting[str(queueObj.customerType)]):
                         temp = np.random.uniform( counterACTMap[key][0] , counterACTMap[key][1] )
                         serviceTime += temp
             else:
-                serviceTime += np.random.uniform(counterSTMap[self.currentCounter][0] , counterSTMap[self.currentCounter][1])
+                serviceTime += np.random.uniform(counterSTMap[self.counterName][0], counterSTMap[self.counterName][1])
 
             #schedule the departure time
             departtime = self.eventTime + serviceTime
 
             #increase the counter wise served by one
-            sim.states.customerServed[queueObj.currentCounter] += 1
+            sim.states.customerServed[queueObj.counterName] += 1
 
             sim.scheduleEvent(DepartureEvent(departtime , sim , queueObj.groupID , queueObj.customerType,
-                                             queueObj.currentCounter , queueObj.queueNo))
+                                             queueObj.counterName , queueObj.queueNo))
 
         else:
             #no One is in the queue
             #make the status of the free employee/server available
-            sim.states.serverAvailable[self.currentCounter] += 1
+            sim.states.serverAvailable[self.counterName] += 1
 
             #if this counter is cash counter then free the cash server
-            if (self.currentCounter == "cash"):
+            if (self.counterName == "cash"):
                 sim.states.cashServer[self.queueNo] = idle
         #---------------------------------------------------------------------------------------------------------------
 
@@ -561,7 +562,7 @@ class DepartureEvent(Event):
 
         thisCounterIndex=0
         for i in range(len(counters)):
-            if(counters[i] == self.currentCounter):
+            if(counters[i] == self.counterName):
                 thisCounterIndex = i
                 break
 
@@ -705,7 +706,6 @@ def cafeteriaModel(index):
 def main():
     #give the index of the employee variation map to get the employee counter
     cafeteriaModel(4)
-
 
 if __name__ == "__main__":
     main()
