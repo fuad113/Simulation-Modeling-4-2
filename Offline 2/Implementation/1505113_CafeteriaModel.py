@@ -13,7 +13,6 @@ interArrivalTimeBetweenGroups = 30
 #simulation Duration is 90 Minutes. So it is converted into seconds
 simulationDuration = 90*60
 
-counters = ["hotfood" , "sandwich" , "drinks" ]
 NoOfCustomerType =3
 customerType = [1,2,3]
 customerTypewiseRouting = {
@@ -430,7 +429,10 @@ class ArrivalEvent(Event):
 
             if(self.counterName == "cash"):
                 for key in counterACTMap:
+                    flag = False
                     if (key in customerTypewiseRouting[str(self.customerType)]):
+                        flag = True
+                    if (flag ==  True):
                         temp = np.random.uniform( counterACTMap[key][0] , counterACTMap[key][1] )
                         serviceTime += temp
             else:
@@ -528,7 +530,10 @@ class DepartureEvent(Event):
 
             if(self.counterName == "cash"):
                 for key in counterACTMap:
-                    if (key in customerTypewiseRouting[str(queueObj.customerType)]):
+                    flag =False
+                    if(key  in customerTypewiseRouting[str(queueObj.customerType)]):
+                        flag = True
+                    if (flag == True):
                         temp = np.random.uniform( counterACTMap[key][0] , counterACTMap[key][1] )
                         serviceTime += temp
             else:
