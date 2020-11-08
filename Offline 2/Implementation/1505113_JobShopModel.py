@@ -1,5 +1,4 @@
 import heapq
-import random
 import math
 import lcgrand as lg
 import numpy as np
@@ -19,6 +18,13 @@ meanServiceTimeForEachStation ={}
 #total simulation time.The duration is given in hour.
 simulationDuration = 8
 simulationIteration = 30
+
+# declaring the variables to hold the metrics from simulation
+finalAvgDelayInQueue = []
+finalAvgQueueLength = []
+finalAvgDelayPerJob = []
+finalAvgTotalJobDelay = 0.0
+finalAvgNumOfJobsInSystem = 0.0
 
 
 #expon function
@@ -141,7 +147,21 @@ class States:
         self.avgNumOfJobsInSystem = self.avgNumOfJobsInSystem / sim.now()
         #---------------------------------------------------------------------------------------------------------------
 
-        return self.avgDelayInQueue,self.avgQueueLength,self.avgDelayPerJob,self.avgTotalJobDelay,self.avgNumOfJobsInSystem
+    def updateMetrics(self , sim):
+        global finalAvgDelayInQueue ,finalAvgQueueLength ,finalAvgDelayPerJob, finalAvgTotalJobDelay ,finalAvgNumOfJobsInSystem
+
+        #dealing withe queues of every station
+        for j in range(1, numOfStations+1 , 1):
+           finalAvgDelayInQueue[j] += self.avgDelayInQueue[j]
+           finalAvgQueueLength[j] += self.avgQueueLength[j]
+
+        #dealing with the Jobs
+        for j in range(1, numOfJobTypes+1 ,1):
+            finalAvgDelayPerJob[j] += self.avgDelayPerJob[j]
+
+        finalAvgTotalJobDelay += self.avgTotalJobDelay
+
+        finalAvgNumOfJobsInSystem += self.avgNumOfJobsInSystem
 
 
 class Event:
@@ -366,13 +386,14 @@ class Simulator:
             self.simclock = event.eventTime
             event.process(self)
 
-        return self.states.finish(self)
-
+        self.states.finish(self)
+        self.states.updateMetrics(self)
 
 
 def jobShopModel():
     global numOfStations,numOfMachinesPerStations,interArrivalTimeforJobsMean,numOfJobTypes,jobProbabilities
     global numOfStationForEachJob,stationRouting,meanServiceTimeForEachStation
+    global finalAvgDelayInQueue, finalAvgQueueLength, finalAvgDelayPerJob, finalAvgTotalJobDelay, finalAvgNumOfJobsInSystem
 
     #-------------------------------------------------------------------------------------------------------------------
     # first read the input file and fillup different variables
@@ -440,44 +461,19 @@ def jobShopModel():
     print()
     #-------------------------------------------------------------------------------------------------------------------
 
-    #main calculation work of the simulation
-
-    #-------------------------------------------------------------------------------------------------------------------
-    #declaring the variables to hold the metrics from simulation
-    finalAvgDelayInQueue = []
-    finalAvgQueueLength = []
-    for i in range(numOfStations+1):
+    #initialize some global Metrics
+    for i in range(numOfStations + 1):
         finalAvgDelayInQueue.append(0.0)
         finalAvgQueueLength.append(0.0)
 
-    finalAvgDelayPerJob = []
-    for i in range(numOfJobTypes+1):
+    for i in range(numOfJobTypes + 1):
         finalAvgDelayPerJob.append(0.0)
-
-    finalAvgTotalJobDelay = 0.0
-    finalAvgNumOfJobsInSystem = 0.0
-    #-------------------------------------------------------------------------------------------------------------------
 
     #-------------------------------------------------------------------------------------------------------------------
     #running the simulation
     for i in range(simulationIteration):
-
         sim = Simulator()
-        avgDelayInQueue,avgQueueLength,avgDelayPerJob,avgTotalJobDelay,avgNumOfJobsInSystem = sim.run()
-
-        #dealing withe queues of every station
-        for j in range(1, numOfStations+1 , 1):
-           finalAvgDelayInQueue[j] += avgDelayInQueue[j]
-           finalAvgQueueLength[j] += avgQueueLength[j]
-
-
-        #dealing with the Jobs
-        for j in range(1, numOfJobTypes+1 ,1):
-            finalAvgDelayPerJob[j] += avgDelayPerJob[j]
-
-        finalAvgTotalJobDelay += avgTotalJobDelay
-
-        finalAvgNumOfJobsInSystem += avgNumOfJobsInSystem
+        sim.run()
     #-------------------------------------------------------------------------------------------------------------------
 
 
@@ -528,5 +524,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

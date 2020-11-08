@@ -1,5 +1,4 @@
 import heapq
-import random
 import math
 import lcgrand as lg
 import numpy as np
@@ -91,8 +90,8 @@ class States:
         cashServers = employeeCounter["cash"]
 
         self.serverAvailable = {
-            "hotfood" : hotfoodServers,
-            "sandwich" : sandwichServers,
+            "hotfood" : 1,
+            "sandwich" : 1,
             "drinks" : drinksServers,
             "cash" : cashServers
         }
@@ -275,15 +274,11 @@ class States:
 
         print("Total Customer served: ", self.customerServed["cash"])
 
-        print("\n\n")
-
         print("Average Queue Length of Every Counter")
         print(self.avgQLength)
 
         print("Max Queue Length of Every Counter")
         print(self.maxQLength)
-
-        print("\n")
 
         print("Average Delay in Oueue of Every Counter")
         print(self.avgQDelay)
@@ -291,16 +286,15 @@ class States:
         print("Max Delay in Oueue of Every Counter")
         print(self.maxQDelay)
 
-        print("\n")
-
         print("Average Delay for Each Type of Customers")
         print(self.avgCustomerTypewiseDelay)
-        print("\n")
 
         print("Max Delay for Each Type of Customers")
         print(self.maxCustomerTypewiseDelay)
 
         print("Overall Average Delay: " , self.overallAvgDelay)
+        print("----------------------------------------------")
+        print()
 
 
 class Event:
@@ -696,21 +690,33 @@ def cafeteriaModel(index):
     counterACTMap["sandwich"][1] = newHighBoundST
     # -------------------------------------------------------------------------------------------------------------------
 
-    print("Employee Counters:",employeeCounter)
-    print("ST map: ", counterSTMap)
-    print("ACT map: " ,counterACTMap)
+    print("----------------------------------------------")
+    print("Employees:",employeeCounter)
 
     #-------------------------------------------------------------------------------------------------------------------
-    seed = 1
+    seed = 113
     np.random.seed(seed)
+
     #run the simulator
     sim =Simulator()
     sim.run()
 
 
 def main():
-    #give the index of the employee variation map to get the employee counter
-    cafeteriaModel(4)
+    '''
+    employeeVariations = {
+        "0": [1 , 1 , 2],
+        "1": [1 , 1 , 3],
+        "2": [2 , 1 , 2],
+        "3": [1 , 2 , 2],
+        "4": [2 , 2 , 2],
+        "5": [2 , 1 , 3],
+        "6": [1 , 2 , 3],
+        "7": [2 , 2 , 3]
+    }
+    '''
+    cafeteriaModel(0)
+
 
 if __name__ == "__main__":
     main()
