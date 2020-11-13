@@ -715,7 +715,7 @@ def main():
         "7": [2 , 2 , 3]
     }
     '''
-    cafeteriaModel(0)
+    cafeteriaModel(6)
 
 
 if __name__ == "__main__":
