@@ -512,7 +512,7 @@ class DepartureEvent(Event):
                 max( sim.states.maxCustomerTypewiseDelay[str(self.customerType)] , timeDelayed)
 
             #no delay for the drinks counter. because there is no queue here
-            if (self.counterName == "hotfood" or self.counterName == "sandwich"):
+            if (self.counterName == "hotfood" or self.counterName == "sandwich" or self.counterName == "cash"):
                 sim.states.avgQDelay[self.counterName] += timeDelayed
                 sim.states.maxQDelay[self.counterName] = max(sim.states.maxQDelay[self.counterName], timeDelayed)
 
@@ -715,7 +715,7 @@ def main():
         "7": [2 , 2 , 3]
     }
     '''
-    cafeteriaModel(6)
+    cafeteriaModel(7)
 
 
 if __name__ == "__main__":
