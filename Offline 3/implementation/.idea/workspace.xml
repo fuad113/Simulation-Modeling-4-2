@@ -14,17 +14,13 @@
       <file leaf-file-name="1505113.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/1505113.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
-              <caret line="133" lean-forward="true" selection-start-line="133" selection-end-line="133" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="107" column="28" selection-start-line="107" selection-start-column="24" selection-end-line="107" selection-end-column="28" />
+            <state relative-caret-position="477">
+              <caret line="298" lean-forward="true" selection-start-line="298" selection-end-line="298" />
+              <folding>
+                <element signature="e#111#1546#0" />
+                <element signature="e#1593#3923#0" />
+                <element signature="e#3973#6162#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -85,7 +81,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.1505113">
     <configuration name="1505113" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="implementation" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -104,9 +100,32 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="implementation" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.1505113" />
+      <item itemvalue="Python.main" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.1505113" />
+        <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
@@ -127,12 +146,12 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16927083" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16927083" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.32965517" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.43448275" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.28551725" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -151,7 +170,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -159,6 +178,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1540">
           <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
+          <folding>
+            <element signature="e#111#1546#0" />
+            <element signature="e#1593#3923#0" />
+            <element signature="e#3973#6162#0" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -214,15 +238,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="107" column="28" selection-start-line="107" selection-start-column="24" selection-end-line="107" selection-end-column="28" />
+        <state relative-caret-position="-1290">
+          <caret line="168" column="32" selection-start-line="168" selection-start-column="31" selection-end-line="168" selection-end-column="32" />
+          <folding>
+            <element signature="e#245#341#0" />
+            <element signature="e#383#738#0" />
+            <element signature="e#790#1634#0" />
+            <element signature="e#1717#1976#0" />
+            <element signature="e#2027#3478#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/1505113.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="297">
-          <caret line="133" lean-forward="true" selection-start-line="133" selection-end-line="133" />
+        <state relative-caret-position="477">
+          <caret line="298" lean-forward="true" selection-start-line="298" selection-end-line="298" />
+          <folding>
+            <element signature="e#111#1546#0" />
+            <element signature="e#1593#3923#0" />
+            <element signature="e#3973#6162#0" />
+          </folding>
         </state>
       </provider>
     </entry>
