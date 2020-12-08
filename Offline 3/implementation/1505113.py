@@ -1,4 +1,5 @@
 from scipy import  stats
+import math
 
 seed= 1505113
 alpha = 0.1
@@ -281,6 +282,34 @@ def correlationTest(j, alpha , numOfRandomNumbers):
 
     n= numOfRandomNumbers
 
+    h= int(((n-1)/j) - 1)
+
+    rho = 0
+
+    for k in range(h+1):
+        u1 = randomNumbers[k * j]
+        u2 = randomNumbers[(k+1) * j]
+
+        rho+= u1*u2
+
+    rho = ( (12 / (h+1)) * rho ) - 3
+
+    var_rho = ((13*h)+7) / (pow((h+1) , 2))
+
+    aj= rho / math.sqrt(var_rho)
+
+    #print(aj)
+
+    #checking rejected or not
+    z = stats.norm.ppf(q = 1-alpha/2)
+
+    if( abs(aj) > z):
+        print("Rejected")
+    else:
+        print("Not Rejected")
+
+    print()
+
 
 def main():
 
@@ -296,7 +325,6 @@ def main():
 
    #correlation testing. parameters are j,alpha & num of random numbers
    correlationTest(1,alpha,10)
-
 
 if __name__ == "__main__":
     main()
