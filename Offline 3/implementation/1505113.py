@@ -8,7 +8,7 @@ alpha = 0.1
 def uniformityTest(k, alpha , numOfRandomNumbers):
 
     print("Performing Uniformity Test")
-    print("k =",k,"alpha =",alpha,"n =",numOfRandomNumbers)
+    print("n =",numOfRandomNumbers,"k =",k,"alpha =",alpha)
     #first generate random numbers
     randomNumbers=[]
 
@@ -56,8 +56,11 @@ def uniformityTest(k, alpha , numOfRandomNumbers):
 
     chiSquared = chiSquared * (k/n)
 
+    print("ChiSquared:",chiSquared)
+
     #checking rejected or not
     X_square = stats.chi2.ppf(q = 1-alpha, df = k-1)
+    print("Chisquared(k-1,1-alpha):",X_square)
 
     if( chiSquared > X_square):
         print("Rejected")
@@ -68,7 +71,7 @@ def uniformityTest(k, alpha , numOfRandomNumbers):
 
 def serialTest(k ,alpha ,d, numOfRandomNumbers):
     print("Perforing Serial Test")
-    print("k =",k , "alpha =",alpha , "d =" ,d , "n =" ,numOfRandomNumbers)
+    print("n =" ,numOfRandomNumbers, "d =" ,d ,"k =",k , "alpha =",alpha )
 
     #first generate random numbers
     randomNumbers=[]
@@ -151,10 +154,11 @@ def serialTest(k ,alpha ,d, numOfRandomNumbers):
 
 
     chiSquared =  chiSquared * ( pow(k,d) / n )
-
+    print("ChiSquared:", chiSquared)
 
     #checking rejected or not
     X_square = stats.chi2.ppf(q = 1-alpha, df = pow(k,d)-1)
+    print("Chisquared(k^d-1,1-alpha):", X_square)
 
     if( chiSquared > X_square):
         print("Rejected")
@@ -248,10 +252,11 @@ def runsTest(alpha , numOfRandomNumbers):
 
     R= R/n
 
-    #print("R=" ,R)
+    print("R=" ,R)
 
     #checking rejected or not
     X_square = stats.chi2.ppf(q = 1-alpha, df = 6)
+    print("Chisquared(6,1-alpha):", X_square)
 
     if( R > X_square):
         print("Rejected")
@@ -263,7 +268,7 @@ def runsTest(alpha , numOfRandomNumbers):
 def correlationTest(j, alpha , numOfRandomNumbers):
 
     print("Performing Correlation Test")
-    print( "j =",j,"alpha =",alpha,"n =",numOfRandomNumbers)
+    print( "n =",numOfRandomNumbers , "j =",j,"alpha =",alpha)
 
     #first generate random numbers
     randomNumbers=[]
@@ -298,12 +303,14 @@ def correlationTest(j, alpha , numOfRandomNumbers):
 
     aj= rho / math.sqrt(var_rho)
 
-    #print(aj)
+    aj= abs(aj)
+    print("Aj=",aj)
 
     #checking rejected or not
     z = stats.norm.ppf(q = 1-alpha/2)
+    print("Z(1-alpha/2):" , z)
 
-    if( abs(aj) > z):
+    if( aj > z):
         print("Rejected")
     else:
         print("Not Rejected")
@@ -312,19 +319,38 @@ def correlationTest(j, alpha , numOfRandomNumbers):
 
 
 def main():
+    nArray = [20,500,4000,10000]
 
-   # #uniformity testing. parameters are k,alpha & number of random numbers
-   # uniformityTest(10,alpha,20)
-   # uniformityTest(20,alpha,100)
+    # #uniformity testing. parameters are k,alpha & n
+    # kArray= [10,20]
+    # for n in range(len(nArray)):
+    #     for k in range(len(kArray)):
+    #         uniformityTest(kArray[k],alpha,nArray[n])
 
-   # #serial testing. parameters are k,alpha ,d & number of random numbers
-   # serialTest(4,alpha,2,100)
 
-   # #runs testing. parameters are alpha & number of random numbers
-   # runsTest(alpha,15)
+    #serial testing. parameters are k,alpha ,d & number of random numbers
+    # dArray = [2,3]
+    # kArray = [4,8]
+    #
+    # for n in range(len(nArray)):
+    #     for d in range(len(dArray)):
+    #         for k in range(len(kArray)):
+    #             serialTest(kArray[k] , alpha , dArray[d] , nArray[n])
 
-   #correlation testing. parameters are j,alpha & num of random numbers
-   correlationTest(1,alpha,10)
+
+
+    #runs testing. parameters are alpha & number of random numbers
+    # for n in range(len(nArray)):
+    #     runsTest(alpha,nArray[n])
+
+
+    #correlation testing. parameters are j,alpha & num of random numbers
+    jArray = [1,3,5]
+
+    for n in range(len(nArray)):
+        for j in range(len(jArray)):
+            correlationTest(jArray[j],alpha,nArray[n])
+
 
 if __name__ == "__main__":
     main()
